@@ -1,0 +1,11 @@
+version: "3"
+services:
+  notebook:
+    image: jupyter/datascience-notebook
+    ports:
+      - "18888:8888"
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+    volumes:
+      - ./notebook:/home/notebook
+    command: start-notebook.sh --NotebookApp.token=''
