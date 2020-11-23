@@ -20,10 +20,10 @@ def conv_list_value_type(data: list) -> list:
 
 
 def to_rfc3339(timestamp: str) -> str:
-        if '/' in timestamp:
-            return datetime.strptime(timestamp.partition('.')[0] + '+0900', '%Y/%m/%d %H:%M:%S%z').isoformat()
-        elif '-' in timestamp:
-            return datetime.strptime(timestamp.partition('.')[0] + '+0900', '%Y-%m-%d %H:%M:%S%z').isoformat()
+    if '/' in timestamp:
+        return datetime.strptime(timestamp.partition('.')[0] + '+0900', '%Y/%m/%d %H:%M:%S%z').isoformat()
+    elif '-' in timestamp:
+        return datetime.strptime(timestamp.partition('.')[0] + '+0900', '%Y-%m-%d %H:%M:%S%z').isoformat()
 
 
 def to_lineProtocol(header: list, fieldline: list, measurement: str, tags: Dict[str, str]) -> Dict:
@@ -51,7 +51,8 @@ def csv_to_lineProtocol(csvfile, measurement, tags) -> List:
         header = table.pop(0)
         line_protocols = []
         for data in table:
-            line_protocols.append(to_lineProtocol(header, data, measurement, tags))
+            line_protocols.append(to_lineProtocol(
+                header, data, measurement, tags))
         return line_protocols
 
 
@@ -59,7 +60,7 @@ class InfluxHandling(InfluxDBClient):
 
     def csv_write(self, csvfile: str, measurement: str, tags: dict) -> None:
         with open(csvfile, 'r') as f:
-            table =  [_ for _ in csv.reader(f)]
+            table = [_ for _ in csv.reader(f)]
             cnt = 0
             try:
                 for row in tqdm(table):
@@ -67,15 +68,14 @@ class InfluxHandling(InfluxDBClient):
                         header = row
                         cnt += 1
                         continue
-                    line_protocol = to_lineProtocol(header, row, measurement, tags)
+                    line_protocol = to_lineProtocol(
+                        header, row, measurement, tags)
                     self.write_points(line_protocol)
             except:
                 pass
         return None
-    
+
     def get_single_column(self, measurement: str, field_key: str) -> List[dict]:
         q = f'SELECT {field_key} FROM {measurement}'
         result = list((self.query(q)))[0]
         return result
-
-
